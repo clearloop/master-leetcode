@@ -46,10 +46,10 @@ pick = '${fid}.${slug}'
 submission = '${fid}.${slug}.${sid}.${ac}'
 
 [cookies]
-csrf = 'FWtgVTWhH5v3aseN7MGjSdGpnfwMb8dRDPMhQwDwZX9GGZeIFKYCRpXahlYQYS99'
-session = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfYXV0aF91c2VyX2lkIjoiMTExNTcyMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImFsbGF1dGguYWNjb3VudC5hdXRoX2JhY2tlbmRzLkF1dGhlbnRpY2F0aW9uQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImFjZDRjOGZiMjYzYzY1OTkzMWU3NGFkODJhZWUzM2I4NTA3ZWZjODciLCJpZCI6MTExNTcyMSwiZW1haWwiOiJ1ZHRyb2tpYUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InVkdHJva2lhIiwidXNlcl9zbHVnIjoidWR0cm9raWEiLCJhdmF0YXIiOiJodHRwczovL2Fzc2V0cy5sZWV0Y29kZS5jb20vdXNlcnMvdWR0cm9raWEvYXZhdGFyXzE1MTkxOTE2NTEucG5nIiwidGltZXN0YW1wIjoiMjAyMC0wMS0wNSAyMTo0ODozMC4xODAxMjMrMDA6MDAiLCJJUCI6IjEyOS4yMjYuMTIyLjE2NCIsIklERU5USVRZIjoiOWQ3MmYzMDc1NTU1ODU4MjkxOGMxZTZiNTAwODk5MDcifQ.wKGN6SBBhC-Jh9XBpx2cdCGq6SJvAJMznN60dU4zppY'
+csrf = ''
+session = ''
 
 [storage]
 cache = 'Problems'
-code = 'code'
+code = 'code/rust'
 root = '~/.leetcode'

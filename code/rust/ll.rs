@@ -25,8 +25,3 @@ impl ListNode {
         node.next
     }
 }
-
-fn main() {
-    let l = ListNode::from(vec![1, 2, 3]);
-    println!("{:#?}", l);
-}

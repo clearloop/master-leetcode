@@ -1,4 +1,4 @@
 **/*Problems
-**/*main*
-/leetcode.toml
-/leetcode_tmp.toml
+**/*tmp*
+**/*leetcode.toml
+**/*leetcode_tmp.toml
