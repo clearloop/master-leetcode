@@ -1,3 +1,5 @@
 # Master-LeetCode
 
-## 2020.1.10
+A repo mastering LeetCode
+
++ [Rust](/src/rust)

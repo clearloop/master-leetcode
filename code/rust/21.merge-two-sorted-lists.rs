@@ -12,8 +12,8 @@
 //         ListNode { next: None, val }
 //     }
 // }
-mod ll;
-use ll::*;
+// mod ll;
+// use ll::*;
 
 impl Solution {
     pub fn merge_two_lists(
@@ -26,7 +26,6 @@ impl Solution {
         let pb = &mut l2;
 
         while pb.is_some() {
-            // pa.as_ref()
             if pa.is_none() || pa.as_ref()?.val > pb.as_ref()?.val {
                 mem::swap(pa, pb);
             } else {
@@ -38,9 +37,9 @@ impl Solution {
     }
 }
 
-fn main() {
-    let l1 = ListNode::from(vec![1, 2, 4]);
-    let l2 = ListNode::from(vec![1, 3, 4]);
-    let r = Solution::merge_two_lists(l1, l2);
-    println!("{:#?}", r);
-}
+// fn main() {
+//     let l1 = ListNode::from(vec![1, 2, 4]);
+//     let l2 = ListNode::from(vec![1, 3, 4]);
+//     let r = Solution::merge_two_lists(l1, l2);
+//     println!("{:#?}", r);
+// }
