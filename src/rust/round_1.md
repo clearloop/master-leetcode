@@ -1,6 +1,6 @@
 # Round 1
 
-## 1. Why `Box<T>`?
+## 1. `Box<T>` and `Rc`
 
 `Box<T>`, casually referred to as a 'box', provides the simplest form of heap allocation in Rust. Boxes provide ownership for this allocation, and drop their contents when they go out of scope.
 
@@ -24,7 +24,27 @@ fn main() {
 
 [1]: https://stackoverflow.com/questions/49377231/when-to-use-rc-vs-box
 
-## 2. `AsRef` and `Borrow`
+## 2. `Cell` and `RefCell`
+
+Values of the `Cell<T>` and `RefCell<T>` types may be mutated through shared references (i.e. the common &T type), whereas most Rust types can only be mutated through unique `(&mut T)` references. We say that `Cell<T>` and `RefCell<T>` provide **'interior mutability'**, in contrast with typical Rust types that exhibit **'inherited mutability'**.
+
+Cell types come in two flavors: `Cell<T>` and `RefCell<T>`. `Cell<T>` implements interior mutability by moving values in and out of the `Cell<T>`. To use references instead of values, one must use the `RefCell<T>` type, acquiring a write lock before mutating. `Cell<T>` provides methods to retrieve and change the current interior value:
+
++ For types that implement `Copy`, the get method retrieves the current interior value.
++ For types that implement `Default`, the `take` method replaces the current interior value with `Default::default()` and returns the replaced value.
++ For all types, the `replace` method replaces the current interior value and returns the replaced value and the `into_inner` method consumes the `Cell<T>` and returns the interior value. Additionally, the `set` method replaces the interior value, dropping the replaced value.
+
+`RefCell<T>` uses Rust's lifetimes to implement `'dynamic borrowing'`, a process whereby one can claim temporary, exclusive, mutable access to the inner value. Borrows for `RefCell<T>`s are tracked `'at runtime'`, unlike Rust's native reference types which are entirely tracked statically, at compile time. Because `RefCell<T>` borrows are dynamic it is possible to attempt to borrow a value that is already mutably borrowed; when this happens it results in thread panic.
+
+### When to choose interior mutability?
+
+The more common inherited mutability, where one must have unique access to mutate a value, is one of the key language elements that enables Rust to reason strongly about pointer aliasing, statically preventing crash bugs. Because of that, inherited mutability is preferred, and interior mutability is something of a last resort. Since cell types enable mutation where it would otherwise be disallowed though, there are occasions when interior mutability might be appropriate, or even must be used, e.g.
+
++ Introducing mutability 'inside' of something immutable
++ Implementation details of logically-immutable methods.
++ Mutating implementations of `Clone`.
+
+## 3. `AsRef` and `Borrow`
 
 `AsRef` is similar to `AsMut` which is used for converting between mutable references. If you need to do a costly conversion it is better to implement From with type &T or write a custom function.
 
@@ -36,7 +56,23 @@ fn main() {
 
 Note: This trait must not fail. If the conversion can fail, use a dedicated method which returns an Option<T> or a Result<T, E>.
 
-## 3. `Clone`、`Copy` and `ToOwned`
+### Example
+
+By creating a generic function that takes an `AsRef<str>` we express that we want to accept all references that can be converted to `&str` as an argument. Since both String and `&str` implement `AsRef<str>` we can accept both as input argument.
+
+```rust
+fn is_hello<T: AsRef<str>>(s: T) {
+   assert_eq!("hello", s.as_ref());
+}
+
+let s = "hello";
+is_hello(s);
+
+let s = "hello".to_string();
+is_hello(s);
+```
+
+## 4. `Clone`、`Copy` and `ToOwned`
 
 Differs from `Copy` in that `Copy` is implicit and extremely inexpensive, while Clone is always explicit and may or may not be expensive. In order to enforce these characteristics, Rust does not allow you to reimplement Copy, but you may reimplement Clone and run arbitrary code.
 
@@ -63,7 +99,7 @@ Both a copy and a move can result in bits being copied in memory, although this 
 
 `ToOnwed` are some types make it possible to go from borrowed to owned, usually by implementing the Clone trait. But Clone works only for going from &T to T. The ToOwned trait generalizes Clone to construct owned data from any borrow of a given type.
 
-## 4. Zero Copy
+## 5. Zero Copy
 
 ### `std::mem::swap`
 

@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="empty.html"><strong aria-hidden="true">1.</strong> C</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">2.</strong> Java</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">3.</strong> Koltin</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">4.</strong> Python</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">5.</strong> Rust</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1.html"><strong aria-hidden="true">5.1.</strong> Round 1</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1_linked_list.html"><strong aria-hidden="true">5.1.1.</strong> Linked-List</a></li></ol></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded "><a href="empty.html"><strong aria-hidden="true">1.</strong> C</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">2.</strong> Java</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">3.</strong> Koltin</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">4.</strong> Python</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">5.</strong> Rust</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1.html"><strong aria-hidden="true">5.1.</strong> Round 1</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1_linked_list.html"><strong aria-hidden="true">5.1.1.</strong> Linked-List</a></li><li class="expanded "><a href="rust/round_1_tree.html"><strong aria-hidden="true">5.1.2.</strong> Tree</a></li></ol></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -156,7 +156,7 @@
 <p>wait for ur commit 🦀</p>
 <p>wait for ur commit 🦀</p>
 <h1><a class="header" href="#round-1" id="round-1">Round 1</a></h1>
-<h2><a class="header" href="#1-why-boxt" id="1-why-boxt">1. Why <code>Box&lt;T&gt;</code>?</a></h2>
+<h2><a class="header" href="#1-boxt-and-rc" id="1-boxt-and-rc">1. <code>Box&lt;T&gt;</code> and <code>Rc</code></a></h2>
 <p><code>Box&lt;T&gt;</code>, casually referred to as a 'box', provides the simplest form of heap allocation in Rust. Boxes provide ownership for this allocation, and drop their contents when they go out of scope.</p>
 <p><strong>What's the difference between <code>Rc&lt;T&gt;</code> and <code>Box&lt;T&gt;</code>?</strong></p>
 <p><code>Rc</code> provides shared ownership so by default its contents can't be mutated, while <code>Box</code> provides exclusive ownership and thus mutation is allowed:</p>
@@ -173,7 +173,23 @@ fn main() {
 <blockquote>
 <p>Checkout this question on <a href="https://stackoverflow.com/questions/49377231/when-to-use-rc-vs-box">stackoverflow</a></p>
 </blockquote>
-<h2><a class="header" href="#2-asref-and-borrow" id="2-asref-and-borrow">2. <code>AsRef</code> and <code>Borrow</code></a></h2>
+<h2><a class="header" href="#2-cell-and-refcell" id="2-cell-and-refcell">2. <code>Cell</code> and <code>RefCell</code></a></h2>
+<p>Values of the <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code> types may be mutated through shared references (i.e. the common &amp;T type), whereas most Rust types can only be mutated through unique <code>(&amp;mut T)</code> references. We say that <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code> provide <strong>'interior mutability'</strong>, in contrast with typical Rust types that exhibit <strong>'inherited mutability'</strong>.</p>
+<p>Cell types come in two flavors: <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code>. <code>Cell&lt;T&gt;</code> implements interior mutability by moving values in and out of the <code>Cell&lt;T&gt;</code>. To use references instead of values, one must use the <code>RefCell&lt;T&gt;</code> type, acquiring a write lock before mutating. <code>Cell&lt;T&gt;</code> provides methods to retrieve and change the current interior value:</p>
+<ul>
+<li>For types that implement <code>Copy</code>, the get method retrieves the current interior value.</li>
+<li>For types that implement <code>Default</code>, the <code>take</code> method replaces the current interior value with <code>Default::default()</code> and returns the replaced value.</li>
+<li>For all types, the <code>replace</code> method replaces the current interior value and returns the replaced value and the <code>into_inner</code> method consumes the <code>Cell&lt;T&gt;</code> and returns the interior value. Additionally, the <code>set</code> method replaces the interior value, dropping the replaced value.</li>
+</ul>
+<p><code>RefCell&lt;T&gt;</code> uses Rust's lifetimes to implement <code>'dynamic borrowing'</code>, a process whereby one can claim temporary, exclusive, mutable access to the inner value. Borrows for <code>RefCell&lt;T&gt;</code>s are tracked <code>'at runtime'</code>, unlike Rust's native reference types which are entirely tracked statically, at compile time. Because <code>RefCell&lt;T&gt;</code> borrows are dynamic it is possible to attempt to borrow a value that is already mutably borrowed; when this happens it results in thread panic.</p>
+<h3><a class="header" href="#when-to-choose-interior-mutability" id="when-to-choose-interior-mutability">When to choose interior mutability?</a></h3>
+<p>The more common inherited mutability, where one must have unique access to mutate a value, is one of the key language elements that enables Rust to reason strongly about pointer aliasing, statically preventing crash bugs. Because of that, inherited mutability is preferred, and interior mutability is something of a last resort. Since cell types enable mutation where it would otherwise be disallowed though, there are occasions when interior mutability might be appropriate, or even must be used, e.g.</p>
+<ul>
+<li>Introducing mutability 'inside' of something immutable</li>
+<li>Implementation details of logically-immutable methods.</li>
+<li>Mutating implementations of <code>Clone</code>.</li>
+</ul>
+<h2><a class="header" href="#3-asref-and-borrow" id="3-asref-and-borrow">3. <code>AsRef</code> and <code>Borrow</code></a></h2>
 <p><code>AsRef</code> is similar to <code>AsMut</code> which is used for converting between mutable references. If you need to do a costly conversion it is better to implement From with type &amp;T or write a custom function.</p>
 <p><strong>AsRef has the same signature as Borrow, but Borrow is different in few aspects:</strong></p>
 <ul>
@@ -185,7 +201,23 @@ fn main() {
 </li>
 </ul>
 <p>Note: This trait must not fail. If the conversion can fail, use a dedicated method which returns an Option<T> or a Result&lt;T, E&gt;.</p>
-<h2><a class="header" href="#3-clonecopy-and-toowned" id="3-clonecopy-and-toowned">3. <code>Clone</code>、<code>Copy</code> and <code>ToOwned</code></a></h2>
+<h3><a class="header" href="#example" id="example">Example</a></h3>
+<p>By creating a generic function that takes an <code>AsRef&lt;str&gt;</code> we express that we want to accept all references that can be converted to <code>&amp;str</code> as an argument. Since both String and <code>&amp;str</code> implement <code>AsRef&lt;str&gt;</code> we can accept both as input argument.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>fn is_hello&lt;T: AsRef&lt;str&gt;&gt;(s: T) {
+   assert_eq!(&quot;hello&quot;, s.as_ref());
+}
+
+let s = &quot;hello&quot;;
+is_hello(s);
+
+let s = &quot;hello&quot;.to_string();
+is_hello(s);
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#4-clonecopy-and-toowned" id="4-clonecopy-and-toowned">4. <code>Clone</code>、<code>Copy</code> and <code>ToOwned</code></a></h2>
 <p>Differs from <code>Copy</code> in that <code>Copy</code> is implicit and extremely inexpensive, while Clone is always explicit and may or may not be expensive. In order to enforce these characteristics, Rust does not allow you to reimplement Copy, but you may reimplement Clone and run arbitrary code.</p>
 <p><code>Copy</code> are the types whose values can be duplicated simply by copying bits:</p>
 <pre><pre class="playpen"><code class="language-rust">
@@ -208,7 +240,7 @@ println!(&quot;{:?}&quot;, x); // A-OK!
 <p>Both a copy and a move can result in bits being copied in memory, although this is sometimes optimized away.</p>
 <p><code>Clone</code> is a supertrait of <code>Copy</code>, so everything which is <code>Copy</code> must also implement <code>Clone</code>. If a type is <code>Copy</code> then its <code>Clone</code> implementation only needs to return *self (see the example above).</p>
 <p><code>ToOnwed</code> are some types make it possible to go from borrowed to owned, usually by implementing the Clone trait. But Clone works only for going from &amp;T to T. The ToOwned trait generalizes Clone to construct owned data from any borrow of a given type.</p>
-<h2><a class="header" href="#4-zero-copy" id="4-zero-copy">4. Zero Copy</a></h2>
+<h2><a class="header" href="#5-zero-copy" id="5-zero-copy">5. Zero Copy</a></h2>
 <h3><a class="header" href="#stdmemswap" id="stdmemswap"><code>std::mem::swap</code></a></h3>
 <p>Swaps the values at two mutable locations, without deinitializing either one.</p>
 <pre><pre class="playpen"><code class="language-rust">
@@ -492,6 +524,7 @@ assert_eq!(y, None);
 }
 <span class="boring">}
 </span></code></pre></pre>
+<h1><a class="header" href="#tree" id="tree">Tree</a></h1>
 
                     </main>
 
