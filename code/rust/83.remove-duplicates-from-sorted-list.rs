@@ -12,29 +12,27 @@
 //         ListNode { next: None, val }
 //     }
 // }
-// mod ll;
-// use ll::*;
+mod ll;
+use ll::*;
 impl Solution {
     pub fn delete_duplicates(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        if head.is_none() {
-            return None;
-        }
+        let mut ptr = head.as_mut()?;
 
-        let mut cur = head.as_mut()?;
-        while let Some(next) = cur.next.as_mut() {
-            if cur.val != next.val {
-                cur = cur.next.as_mut()?;
-                continue;
+        while let Some(next) = ptr.next.as_mut() {
+            if ptr.val == next.val {
+                // let tmp = std::mem::replace(&mut next.next, None);
+                // std::mem::replace(&mut ptr.next, tmp);
+                ptr.next = next.next.take();
+            } else {
+                ptr = ptr.next.as_mut()?;
             }
-            let b2n = std::mem::replace(&mut next.next, None);
-            std::mem::replace(&mut cur.next, b2n);
         }
 
         head
     }
 }
 
-// fn main() {
-//     let r = Solution::delete_duplicates(ListNode::from(vec![1, 2, 2, 3]));
-//     println!("{:?}", r);
-// }
+fn main() {
+    let r = Solution::delete_duplicates(ListNode::from(vec![1, 2, 2, 3]));
+    println!("{:#?}", r);
+}

@@ -260,19 +260,6 @@ assert_eq!(y, None);
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span><span class="boring">struct Solution;
-</span><span class="boring">#[derive(PartialEq, Eq, Clone, Debug)]
-</span><span class="boring">pub struct ListNode {
-</span><span class="boring">    pub val: i32,
-</span><span class="boring">    pub next: Option&lt;Box&lt;ListNode&gt;&gt;,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl ListNode {
-</span><span class="boring">    #[inline]
-</span><span class="boring">    fn new(val: i32) -&gt; Self {
-</span><span class="boring">        ListNode { next: None, val }
-</span><span class="boring">    }
-</span><span class="boring">}
 </span>impl Solution {
     pub fn merge_two_lists(
         mut l1: Option&lt;Box&lt;ListNode&gt;&gt;,
@@ -283,10 +270,10 @@ assert_eq!(y, None);
         let mut pa = &amp;mut l1;
         let pb = &amp;mut l2;
 
-	    // Merge l2 to l1
-		//
-		// Current List -&gt;  &quot;**&gt;&gt;&gt;&quot;
-		// Dynamic List -&gt;  &quot;&gt;&gt;&gt;&gt;&gt;&quot;
+        // Merge l2 to l1
+        //
+        // Current List -&gt;  &quot;**&gt;&gt;&gt;&quot;
+        // Dynamic List -&gt;  &quot;&gt;&gt;&gt;&gt;&gt;&quot;
         while pb.is_some() {
             if pa.is_none() || pa.as_ref()?.val &gt; pb.as_ref()?.val {
                 mem::swap(pa, pb);
@@ -296,6 +283,55 @@ assert_eq!(y, None);
         }
 
         l1
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#83remove-duplicate-from-sorted-list" id="83remove-duplicate-from-sorted-list">83.remove-duplicate-from-sorted-list</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn delete_duplicates(
+	  mut head: Option&lt;Box&lt;ListNode&gt;&gt;
+	) -&gt; Option&lt;Box&lt;ListNode&gt;&gt; {
+        let mut ptr = head.as_mut()?;
+
+        while let Some(next) = ptr.next.as_mut() {
+            if ptr.val == next.val {
+                // let tmp = std::mem::replace(&amp;mut next.next, None);
+                // std::mem::replace(&amp;mut ptr.next, tmp);
+                ptr.next = next.next.take();
+            } else {
+                ptr = ptr.next.as_mut()?;
+            }
+        }
+
+        head
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#141-linked-list-cycle" id="141-linked-list-cycle">141. linked-list-cycle</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn has_circle(mut head: Option&lt;Box&lt;ListNode&gt;&gt;) -&gt; Option&lt;bool&gt; {
+        let mut slow = &amp;mut head;
+        let mut fast = slow.clone();
+
+        while slow.is_some() &amp;&amp; slow.as_ref()?.next.as_ref()?.next.is_some() {
+            slow = &amp;mut slow.as_mut()?.next;
+            fast = fast.unwrap().next.unwrap().next;
+			
+            // if two pointers meet, cycle exists.
+            if slow.as_ref()? == fast.as_ref()? {
+                return Some(true);
+            }
+        }
+
+        return None;
     }
 }
 <span class="boring">}
