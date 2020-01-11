@@ -36,16 +36,16 @@ impl Solution {
     pub fn delete_duplicates(
 	  mut head: Option<Box<ListNode>>
 	) -> Option<Box<ListNode>> {
-        let mut ptr = head.as_mut()?;
+        let mut ptr = &mut head;
+        let mut _nxt: Option<Box<ListNode>> = None;
 
-        while let Some(next) = ptr.next.as_mut() {
-            if ptr.val == next.val {
-                // let tmp = std::mem::replace(&mut next.next, None);
-                // std::mem::replace(&mut ptr.next, tmp);
-                ptr.next = next.next.take();
-            } else {
-                ptr = ptr.next.as_mut()?;
+        while ptr.is_some() && ptr.as_ref()?.next.is_some() {
+            if ptr.as_ref()?.val == ptr.as_ref()?.next.as_ref()?.val {
+                // make sure not using next.next directly
+                _nxt = ptr.as_mut()?.next.take();
+                ptr.as_mut()?.next = _nxt.as_mut()?.next.take();
             }
+            ptr = &mut ptr.as_mut()?.next;
         }
 
         head
@@ -72,6 +72,152 @@ impl Solution {
         }
 
         return None;
+    }
+}
+```
+
+## 160. intersection-of-two-linked-list
+```rust
+impl Solution {
+    pub fn get_intersection(
+        mut l1: Option<Box<ListNode>>,
+        mut l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        let mut pa = &mut l1.clone();
+        let mut pb = &mut l2.clone();
+
+        while pa.is_some() && pb.is_some() {
+		    // The end of both two is the intersection.
+            if pa == pb {
+                return pa.to_owned();
+            }
+
+            if pa.as_ref()?.next.is_some() {
+                pa = &mut pa.as_mut()?.next;
+            } else {
+                pa = &mut l2;
+            }
+
+            if pb.as_ref()?.next.is_some() {
+                pb = &mut pb.as_mut()?.next;
+            } else {
+                pb = &mut l1;
+            }
+        }
+
+        None
+    }
+}
+```
+
+## 203 remove-linked-list-element
+```rust
+impl Solution {
+    pub fn remove_elements(
+	  mut head: Option<Box<ListNode>>, val: i32
+	) -> Option<Box<ListNode>> {
+        let mut ptr = &mut head;
+
+        while ptr.is_some() {
+            // replace current value in memory
+            if ptr.as_ref()?.val == val {
+                // *ptr = std::mem::replace(&mut ptr.as_mut()?.next, None);
+                *ptr = ptr.as_mut()?.next.take();
+            } else {
+                ptr = &mut ptr.as_mut()?.next;
+            }
+        }
+
+        head
+    }
+}
+```
+
+## 206. reverse-linked-list
+```rust
+impl Solution {
+    pub fn reverse_list(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut ret = None;
+        let mut _nxt = None;
+
+        while head.is_some() {
+            _nxt = head.as_mut()?.next.take();
+            head.as_mut()?.next = ret;
+            ret = head;
+
+            // Reverse
+            //
+            // Old ListNode: "***>>"
+            // Ret ListNode: ">>>"
+            head = _nxt;
+        }
+
+        ret
+    }
+}
+```
+
+## 234. palindrome-linked-list
+```rust
+impl Solution {
+    pub fn is_palindrome(mut head: Option<Box<ListNode>>) -> bool {
+        if head.is_none() {
+            return true;
+        }
+
+        let mut rev: Option<Box<ListNode>> = None;
+        let mut _nxt: Option<Box<ListNode>> = None;
+        
+		// Just like 206, half to half
+        while head.is_some() {
+            if rev == head || rev == head.as_ref().unwrap().next {
+                return true;
+            }
+
+            _nxt = head.as_mut().unwrap().next.take();
+            head.as_mut().unwrap().next = rev;
+            rev = head;
+            head = _nxt;
+        }
+
+        false
+    }
+}
+```
+
+## 237.delete-node-in-a-linked-list
+
+> Same as 203
+
+## 876.middle-of-the-linked-list
+
+```rust
+impl Solution {
+    pub fn middle_node(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut ptr = head.clone();
+
+        while ptr.is_some() && ptr.as_ref()?.next.is_some() {
+            ptr = ptr.unwrap().next.unwrap().next;
+            head = head.unwrap().next;
+        }
+
+        head
+    }
+}
+```
+
+## 1290.convert-binary-number-in-a-linked-list-to-integer
+
+```rust
+impl Solution {
+    pub fn get_decimal_value(mut head: Option<Box<ListNode>>) -> i32 {
+        let mut ret = 0;
+        while head.is_some() {
+            ret = (ret << 1) | head.as_ref().unwrap().val;
+            head = head.unwrap().next;
+        }
+
+        ret
     }
 }
 ```

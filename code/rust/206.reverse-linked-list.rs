@@ -19,15 +19,19 @@ use ll::*;
 
 impl Solution {
     pub fn reverse_list(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        let mut ptr = &mut head;
-        let mut ret: Option<Box<ListNode>> = None;
+        let mut ret = None;
+        let mut _nxt = None;
 
-        while ptr.is_some() {
-            let tmp = ptr.as_mut()?;
-            tmp.next = ret;
-            ret = tmp.take();
+        while head.is_some() {
+            _nxt = head.as_mut()?.next.take();
+            head.as_mut()?.next = ret;
+            ret = head;
 
-            ptr = &mut ptr.as_mut()?.next;
+            // Reverse
+            //
+            // Old ListNode: "***>>"
+            // Ret ListNode: ">>>"
+            head = _nxt;
         }
 
         ret

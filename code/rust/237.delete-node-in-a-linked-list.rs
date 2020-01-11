@@ -23,7 +23,6 @@ impl Solution {
         while ptr.is_some() {
             // replace current value in memory
             if ptr.as_ref()?.val == val {
-                // *ptr = std::mem::replace(&mut ptr.as_mut()?.next, None);
                 *ptr = ptr.as_mut()?.next.take();
             } else {
                 ptr = &mut ptr.as_mut()?.next;

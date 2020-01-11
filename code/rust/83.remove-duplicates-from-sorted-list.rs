@@ -16,16 +16,16 @@ mod ll;
 use ll::*;
 impl Solution {
     pub fn delete_duplicates(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        let mut ptr = head.as_mut()?;
+        let mut ptr = &mut head;
+        let mut _nxt: Option<Box<ListNode>> = None;
 
-        while let Some(next) = ptr.next.as_mut() {
-            if ptr.val == next.val {
-                // let tmp = std::mem::replace(&mut next.next, None);
-                // std::mem::replace(&mut ptr.next, tmp);
-                ptr.next = next.next.take();
-            } else {
-                ptr = ptr.next.as_mut()?;
+        while ptr.is_some() && ptr.as_ref()?.next.is_some() {
+            if ptr.as_ref()?.val == ptr.as_ref()?.next.as_ref()?.val {
+                // make sure not directly use next.next
+                _nxt = ptr.as_mut()?.next.take();
+                ptr.as_mut()?.next = _nxt.as_mut()?.next.take();
             }
+            ptr = &mut ptr.as_mut()?.next;
         }
 
         head
