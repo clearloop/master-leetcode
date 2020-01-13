@@ -235,6 +235,36 @@ impl Solution {
 }
 ```
 
+## 235.lowest-common-ancestor-of-a-binary-search-tree
+```rust
+impl Solution {
+    fn lca(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        p: Option<Rc<RefCell<TreeNode>>>,
+        q: Option<Rc<RefCell<TreeNode>>>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        if root.is_none() || p.is_none() || q.is_none() {
+            return None;
+        }
+
+        // lca should not be none
+        let (mut root, p, q) = (root.unwrap(), p.unwrap(), q.unwrap());
+        while (root.val - p.val) * (root.val - q.val) > 0 {
+            if root == None {
+                return None;
+            }
+
+            if p.val > root.val {
+                root = root.right.unwrap_or(None);
+            } else {
+                root = root.left.unwrap_or(None);
+            }
+        }
+        root
+    }
+}
+```
+
 ## 257.binary-tree-paths
 ```rust
 impl Solution {
@@ -373,6 +403,130 @@ impl Solution {
             return Self::h(&r.right.clone(), last, res);
         }
         return (last, res);
+    }
+}
+```
+
+## 538.convert-bst-to-greater-tree
+
+```rust
+impl Solution {
+    pub fn convert_bst(
+	  mut root: Option<Rc<RefCell<TreeNode>>>
+	) -> Option<Rc<RefCell<TreeNode>>> {
+        let mut sum = 0;
+        Self::h(&mut root, &mut sum);
+        root
+    }
+
+    fn h(r: &mut Option<Rc<RefCell<TreeNode>>>, sum: &mut i32) {
+        if let Some(r) = r {
+            let mut r = r.borrow_mut();
+            Self::h(&mut r.right, sum);
+            r.val += *sum;
+            *sum = r.val;
+            Self::h(&mut r.left, sum);
+        }
+    }
+}
+```
+
+## 543.diameter-of-binary-tree
+```rust
+impl Solution {
+    pub fn diameter_of_binary_tree(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut d = 1;
+        Self::h(&root, &mut d);
+        d - 1
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, d: &mut i32) -> i32 {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let p = Self::h(&r.left, d);
+            let q = Self::h(&r.right, d);
+            *d = d.to_owned().max(p + q + 1);
+            1 + p.max(q)
+        } else {
+            0
+        }
+    }
+}
+```
+
+## 563.binary-tree-tilt
+```rust
+impl Solution {
+    pub fn find_tilt(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut s = 0;
+        Self::h(&root, &mut s);
+        s
+    }
+
+    fn h(n: &Option<Rc<RefCell<TreeNode>>>, s: &mut i32) -> i32 {
+        if let Some(n) = n {
+            let n = n.borrow();
+            let l = Self::h(&n.left, s);
+            let r = Self::h(&n.right, s);
+            *s += (l - r).abs();
+            n.val + l + r
+        } else {
+            0
+        }
+    }
+}
+```
+
+## 572.subtree-of-another-tree
+```rust
+impl Solution {
+    pub fn is_subtree(
+	  s: Option<Rc<RefCell<TreeNode>>>, 
+	  t: Option<Rc<RefCell<TreeNode>>>,
+	) -> bool {
+        Self::h(&s, &t)
+    }
+
+    fn h(
+	  s: &Option<Rc<RefCell<TreeNode>>>, 
+	  t: &Option<Rc<RefCell<TreeNode>>>
+	) -> bool {
+        if s == t {
+            return true;
+        } else if s.is_none() {
+            return false;
+        }
+
+        let s = s.as_ref().unwrap().borrow();
+        Self::h(&s.left, t) || Self::h(&s.right, t)
+    }
+}
+```
+
+## 606.construct-string-from-binary-tree
+```rust
+impl Solution {
+    pub fn tree2str(t: Option<Rc<RefCell<TreeNode>>>) -> String {
+        Self::h(&t)
+    }
+
+    fn h(t: &Option<Rc<RefCell<TreeNode>>>) -> String {
+        if let Some(t) = t {
+            let t = t.borrow();
+            let l = Self::h(&t.left);
+            let r = Self::h(&t.right);
+            let mut s = t.val.to_string();
+            let f = match (l.is_empty(), r.is_empty()) {
+                (true, true) => "".to_string(),
+                (false, true) => format!("({})", &l),
+                (true, false) => format!("()({})", &r),
+                (false, false) => format!("({})({})", &l, &r),
+            };
+            s += &f;
+            s
+        } else {
+            "".to_string()
+        }
     }
 }
 ```

@@ -771,6 +771,38 @@ impl Solution {
 }
 <span class="boring">}
 </span></code></pre></pre>
+<h2><a class="header" href="#235lowest-common-ancestor-of-a-binary-search-tree" id="235lowest-common-ancestor-of-a-binary-search-tree">235.lowest-common-ancestor-of-a-binary-search-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    fn lca(
+        root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+        p: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+        q: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+    ) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        if root.is_none() || p.is_none() || q.is_none() {
+            return None;
+        }
+
+        // lca should not be none
+        let (mut root, p, q) = (root.unwrap(), p.unwrap(), q.unwrap());
+        while (root.val - p.val) * (root.val - q.val) &gt; 0 {
+            if root == None {
+                return None;
+            }
+
+            if p.val &gt; root.val {
+                root = root.right.unwrap_or(None);
+            } else {
+                root = root.left.unwrap_or(None);
+            }
+        }
+        root
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
 <h2><a class="header" href="#257binary-tree-paths" id="257binary-tree-paths">257.binary-tree-paths</a></h2>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
@@ -918,6 +950,139 @@ impl Solution {
             return Self::h(&amp;r.right.clone(), last, res);
         }
         return (last, res);
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#538convert-bst-to-greater-tree" id="538convert-bst-to-greater-tree">538.convert-bst-to-greater-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn convert_bst(
+	  mut root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;
+	) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        let mut sum = 0;
+        Self::h(&amp;mut root, &amp;mut sum);
+        root
+    }
+
+    fn h(r: &amp;mut Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, sum: &amp;mut i32) {
+        if let Some(r) = r {
+            let mut r = r.borrow_mut();
+            Self::h(&amp;mut r.right, sum);
+            r.val += *sum;
+            *sum = r.val;
+            Self::h(&amp;mut r.left, sum);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#543diameter-of-binary-tree" id="543diameter-of-binary-tree">543.diameter-of-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn diameter_of_binary_tree(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        let mut d = 1;
+        Self::h(&amp;root, &amp;mut d);
+        d - 1
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, d: &amp;mut i32) -&gt; i32 {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let p = Self::h(&amp;r.left, d);
+            let q = Self::h(&amp;r.right, d);
+            *d = d.to_owned().max(p + q + 1);
+            1 + p.max(q)
+        } else {
+            0
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#563binary-tree-tilt" id="563binary-tree-tilt">563.binary-tree-tilt</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn find_tilt(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        let mut s = 0;
+        Self::h(&amp;root, &amp;mut s);
+        s
+    }
+
+    fn h(n: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, s: &amp;mut i32) -&gt; i32 {
+        if let Some(n) = n {
+            let n = n.borrow();
+            let l = Self::h(&amp;n.left, s);
+            let r = Self::h(&amp;n.right, s);
+            *s += (l - r).abs();
+            n.val + l + r
+        } else {
+            0
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#572subtree-of-another-tree" id="572subtree-of-another-tree">572.subtree-of-another-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn is_subtree(
+	  s: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  t: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+	) -&gt; bool {
+        Self::h(&amp;s, &amp;t)
+    }
+
+    fn h(
+	  s: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;
+	) -&gt; bool {
+        if s == t {
+            return true;
+        } else if s.is_none() {
+            return false;
+        }
+
+        let s = s.as_ref().unwrap().borrow();
+        Self::h(&amp;s.left, t) || Self::h(&amp;s.right, t)
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#606construct-string-from-binary-tree" id="606construct-string-from-binary-tree">606.construct-string-from-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn tree2str(t: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; String {
+        Self::h(&amp;t)
+    }
+
+    fn h(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; String {
+        if let Some(t) = t {
+            let t = t.borrow();
+            let l = Self::h(&amp;t.left);
+            let r = Self::h(&amp;t.right);
+            let mut s = t.val.to_string();
+            let f = match (l.is_empty(), r.is_empty()) {
+                (true, true) =&gt; &quot;&quot;.to_string(),
+                (false, true) =&gt; format!(&quot;({})&quot;, &amp;l),
+                (true, false) =&gt; format!(&quot;()({})&quot;, &amp;r),
+                (false, false) =&gt; format!(&quot;({})({})&quot;, &amp;l, &amp;r),
+            };
+            s += &amp;f;
+            s
+        } else {
+            &quot;&quot;.to_string()
+        }
     }
 }
 <span class="boring">}
