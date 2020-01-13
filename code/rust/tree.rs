@@ -34,7 +34,7 @@ impl TreeNode {
     }
 
     pub fn full_from_arr(arr: Vec<Option<i32>>, i: usize) -> Option<Rc<RefCell<TreeNode>>> {
-        if arr.len() == 0 || i >= arr.len() {
+        if arr.len() == 0 || i >= arr.len() || arr[i] == None {
             return None;
         }
 
@@ -44,10 +44,4 @@ impl TreeNode {
 
         Some(root)
     }
-}
-
-fn main() {
-    // let tn = TreeNode::bst_from_arr(vec![Some(1), Some(2), Some(3), Some(4)]);
-    let tn = TreeNode::full_from_arr(vec![Some(1), Some(2), Some(3), Some(4)], 0);
-    println!("{:#?}", tn);
 }

@@ -150,11 +150,11 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p>wait for ur commit 🦀</p>
-<p>wait for ur commit 🦀</p>
-<p>wait for ur commit 🦀</p>
-<p>wait for ur commit 🦀</p>
-<p>wait for ur commit 🦀</p>
+                        <p>waiting for ur commit 🦀</p>
+<p>waiting for ur commit 🦀</p>
+<p>waiting for ur commit 🦀</p>
+<p>waiting for ur commit 🦀</p>
+<p>waiting for ur commit 🦀</p>
 <h1><a class="header" href="#round-1" id="round-1">Round 1</a></h1>
 <h2><a class="header" href="#1-boxt-and-rc" id="1-boxt-and-rc">1. <code>Box&lt;T&gt;</code> and <code>Rc</code></a></h2>
 <p><code>Box&lt;T&gt;</code>, casually referred to as a 'box', provides the simplest form of heap allocation in Rust. Boxes provide ownership for this allocation, and drop their contents when they go out of scope.</p>
@@ -525,6 +525,403 @@ assert_eq!(y, None);
 <span class="boring">}
 </span></code></pre></pre>
 <h1><a class="header" href="#tree" id="tree">Tree</a></h1>
+<h2><a class="header" href="#100same-tree" id="100same-tree">100.same-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn is_same_tree(
+        p: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+        q: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+    ) -&gt; bool {
+        Self::eq(&amp;p, &amp;q)
+    }
+
+    fn eq(
+	  p: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  q: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;
+	) -&gt; bool {
+        match (p, q) {
+            (Some(p), Some(q)) =&gt; {
+                let (p, q) = (p.borrow(), q.borrow());
+                p.val == q.val 
+				  &amp;&amp; Solution::eq(&amp;p.left, &amp;q.left) 
+				  &amp;&amp; Solution::eq(&amp;p.right, &amp;q.right)
+            }
+            (None, None) =&gt; true,
+            _ =&gt; false,
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#101symmetric-tree" id="101symmetric-tree">101.symmetric-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn is_symmetric(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; bool {
+        if let Some(r) = root {
+            let r = r.borrow();
+            return Self::mirror(&amp;r.left, &amp;r.right);
+        }
+
+        true
+    }
+
+    pub fn mirror(
+	  t1: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  t2: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;
+	) -&gt; bool {
+        match (t1, t2) {
+            (&amp;None, &amp;None) =&gt; true,
+            (Some(n1), Some(n2)) =&gt; {
+                let (n1, n2) = (n1.borrow(), n2.borrow());
+
+                n1.val == n2.val
+                    &amp;&amp; Self::mirror(&amp;n1.left, &amp;n2.right)
+                    &amp;&amp; Self::mirror(&amp;n2.left, &amp;n1.right)
+            }
+            _ =&gt; false,
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#104maximum-depth-of-binary-tree" id="104maximum-depth-of-binary-tree">104.maximum-depth-of-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn max_depth(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        Self::ruler(&amp;root, 0)
+    }
+
+    fn ruler(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, d: i32) -&gt; i32 {
+        if let Some(t) = t {
+            let t = t.borrow();
+            return std::cmp::max(
+			  Self::ruler(&amp;t.left, d + 1), 
+			  Self::ruler(&amp;t.right, d + 1)
+		    );
+        }
+
+        d
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#107binary-tree-level-order-traversal-ii" id="107binary-tree-level-order-traversal-ii">107.binary-tree-level-order-traversal-ii</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn level_order_bottom(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; Vec&lt;Vec&lt;i32&gt;&gt; {
+        let mut res: Vec&lt;Vec&lt;i32&gt;&gt; = Vec::new();
+        Self::bu(0, &amp;root, res.as_mut());
+        res.reverse();
+        res
+    }
+
+    fn bu(d: usize, r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, res: &amp;mut Vec&lt;Vec&lt;i32&gt;&gt;) {
+        if let Some(r) = r {
+            if res.len() == d {
+                res.push(Vec::new());
+            }
+
+            res[d].push(r.borrow().val);
+            Self::bu(d + 1, &amp;r.borrow().left, res);
+            Self::bu(d + 1, &amp;r.borrow().right, res);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#108convert-sorted-array-to-binary-earch-tree" id="108convert-sorted-array-to-binary-earch-tree">108.convert-sorted-array-to-binary-earch-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn sorted_array_to_bst(nums: Vec&lt;i32&gt;) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        Self::h(nums)
+    }
+
+    pub fn h(v: Vec&lt;i32&gt;) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        if v.len() == 0 {
+            return None;
+        }
+
+        let mid = v.len() / 2;
+        let root = Rc::new(RefCell::new(TreeNode::new(v[mid])));
+        root.borrow_mut().left = Self::h(v[..mid].to_vec());
+        root.borrow_mut().right = Self::h(v[mid + 1..].to_vec());
+        Some(root)
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#110balanced-binary-tree" id="110balanced-binary-tree">110.balanced-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn is_balanced(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; bool {
+        Self::bd(&amp;root).is_ok()
+    }
+
+    fn bd(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; Result&lt;i32, ()&gt; {
+        if let Some(r) = r {
+            let lt = Self::bd(&amp;r.borrow().left)?;
+            let rt = Self::bd(&amp;r.borrow().right)?;
+            if (lt - rt).abs() &gt; 1 {
+                Err(())
+            } else {
+                Ok(1 + std::cmp::max(lt, rt))
+            }
+        } else {
+            Ok(0)
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#111minmum-depth-of-binary-tree" id="111minmum-depth-of-binary-tree">111.minmum-depth-of-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn min_depth(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        match root {
+            Some(r) =&gt; Self::h(&amp;Some(r)),
+            None =&gt; 0,
+        }
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        if let Some(r) = r {
+            let lt = Self::h(&amp;r.borrow().left);
+            let rt = Self::h(&amp;r.borrow().right);
+            if lt == 0 || rt == 0 {
+                1 + lt + rt
+            } else {
+                std::cmp::min(lt, rt) + 1
+            }
+        } else {
+            0
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#112path-sum" id="112path-sum">112.path-sum</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn has_path_sum(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, sum: i32) -&gt; bool {
+        Self::h(&amp;root, sum)
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, sum: i32) -&gt; bool {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let (lt, rt, val) = (&amp;r.left, &amp;r.right, r.val);
+            match (lt, rt) {
+                (None, None) =&gt; sum == val,
+                _ =&gt; Self::h(&amp;lt, sum - val) || Self::h(&amp;rt, sum - val),
+            }
+        } else {
+            false
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#226invert-binary-tree" id="226invert-binary-tree">226.invert-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn invert_tree(
+	  mut root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;
+	) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        Self::h(&amp;mut root);
+        root
+    }
+
+    fn h(r: &amp;mut Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) {
+        if let Some(r) = r {
+            let mut r = r.borrow_mut();
+            Self::h(&amp;mut r.left);
+            Self::h(&amp;mut r.right);
+
+            let lt = std::mem::replace(&amp;mut r.left, None);
+            let rt = std::mem::replace(&amp;mut r.right, lt);
+            std::mem::replace(&amp;mut r.left, rt);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#257binary-tree-paths" id="257binary-tree-paths">257.binary-tree-paths</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn binary_tree_paths(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; Vec&lt;String&gt; {
+        let mut res: Vec&lt;String&gt; = Vec::new();
+        Self::h(&amp;root, &quot;&quot;, &amp;mut res);
+        res
+    }
+
+    fn h(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, mut p: &amp;str, mut r: &amp;mut Vec&lt;String&gt;) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            let val = t.val.to_string();
+            let cp = if p.len() == 0 {
+                val
+            } else {
+                p.clone().to_owned() + &quot;-&gt;&quot; + &amp;val
+            };
+
+            if t.left.is_none() &amp;&amp; t.right.is_none() {
+                r.push(cp);
+            } else {
+                Self::h(&amp;t.left, &amp;cp, r);
+                Self::h(&amp;t.right, &amp;cp, r);
+            }
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#404sum-of-left-leaves" id="404sum-of-left-leaves">404.sum-of-left-leaves</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn sum_of_left_leaves(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        let mut sum = 0;
+        Self::h(&amp;root, &amp;mut sum);
+        sum
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, s: &amp;mut i32) {
+        if let Some(r) = r {
+            let r = r.borrow();
+
+            // add
+            if let Some(l) = &amp;r.left {
+                let l = l.borrow();
+                if l.left.is_none() &amp;&amp; l.right.is_none() {
+                    *s += l.val;
+                }
+            }
+
+            // rescursion
+            Self::h(&amp;r.left, s);
+            Self::h(&amp;r.right, s);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#437path-sum-iii" id="437path-sum-iii">437.path-sum-iii</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn path_sum(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, sum: i32) -&gt; i32 {
+        let mut res = 0;
+        Self::h(&amp;mut res, sum, &amp;root);
+        if let Some(r) = root {
+            let r = r.borrow();
+            res += Self::path_sum(r.left.clone(), sum);
+            res += Self::path_sum(r.right.clone(), sum);
+        }
+        res
+    }
+
+    fn h(r: &amp;mut i32, s: i32, t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            if t.val == s {
+                *r += 1;
+            }
+
+            Self::h(r, s - t.val, &amp;t.left);
+            Self::h(r, s - t.val, &amp;t.right);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#501find-mode-in-binary-search-tree" id="501find-mode-in-binary-search-tree">501.find-mode-in-binary-search-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn find_mode(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; Vec&lt;i32&gt; {
+        let mut counter: HashMap&lt;i32, i32&gt; = HashMap::new();
+        let mut rth = vec![];
+        Self::h(&amp;root, &amp;mut counter);
+
+        // !important
+        if counter.is_empty() {
+            return rth;
+        }
+
+        let max = *counter.values().max().unwrap();
+        for (&amp;k, &amp;v) in counter.iter() {
+            if v == max {
+                rth.push(k);
+            }
+        }
+        rth
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, counter: &amp;mut HashMap&lt;i32, i32&gt;) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let count = counter.entry(r.val).or_insert(0);
+            *count += 1;
+            Self::h(&amp;r.left, counter);
+            Self::h(&amp;r.right, counter);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#530minimum-absolute-difference-in-bst" id="530minimum-absolute-difference-in-bst">530.minimum-absolute-difference-in-bst</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn get_minimum_difference(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        Self::h(&amp;root, MIN, MAX).1
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, last: i32, res: i32) -&gt; (i32, i32) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let (mut last, mut res) = Self::h(&amp;r.left.clone(), last, res);
+            res = res.min(r.val.saturating_sub(last));
+            last = r.val;
+            return Self::h(&amp;r.right.clone(), last, res);
+        }
+        return (last, res);
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
 
                     </main>
 
