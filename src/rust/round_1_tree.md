@@ -530,3 +530,124 @@ impl Solution {
     }
 }
 ```
+
+## 617.merge-two-binary-trees
+```rust
+impl Solution {
+    pub fn merge_trees(
+        mut t1: Option<Rc<RefCell<TreeNode>>>,
+        mut t2: Option<Rc<RefCell<TreeNode>>>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        Self::h(&mut t1, &mut t2);
+        t1
+    }
+
+    fn h(
+	  p: &mut Option<Rc<RefCell<TreeNode>>>, 
+	  q: &mut Option<Rc<RefCell<TreeNode>>>,
+	) {
+        if p.is_some() && q.is_some() {
+            let (mut p, mut q) = (
+                p.as_mut().unwrap().borrow_mut(),
+                q.as_mut().unwrap().borrow_mut(),
+            );
+            p.val += q.val;
+            Self::h(&mut p.left, &mut q.left);
+            Self::h(&mut p.right, &mut q.right);
+        } else if p.is_none() && q.is_some() {
+            *p = q.take();
+        }
+    }
+}
+```
+
+## 637.average-of-levels-in-binary-tree
+```rust
+impl Solution {
+    pub fn average_of_levels(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<f64> {
+        let mut res: Vec<f64> = vec![];
+        let mut pre_res: Vec<Vec<f64>> = vec![];
+        Self::h(&root, &mut pre_res, 0);
+        pre_res.iter().for_each(|a| {
+            res.push(a.iter().sum::<f64>() / a.len() as f64);
+        });
+        res
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, res: &mut Vec<Vec<f64>>, level: usize) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if res.len() < level + 1 {
+                res.push(vec![r.val as f64]);
+            } else {
+                res[level].push(r.val as f64);
+            }
+
+            Self::h(&r.left, res, level + 1);
+            Self::h(&r.right, res, level + 1);
+        }
+    }
+}
+```
+
+## 653.two-sum-iv-input-is-a-bst
+
+```rust
+impl Solution {
+    pub fn find_target(root: Option<Rc<RefCell<TreeNode>>>, k: i32) -> bool {
+        let mut m = HashMap::<i32, i32>::new();
+        Self::h(&root, k, &mut m)
+    }
+
+    fn h(
+	  r: &Option<Rc<RefCell<TreeNode>>>, 
+	  k: i32, m: &mut HashMap<i32, i32>
+	) -> bool {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if r.val != (k - r.val) {
+                m.insert(r.val, (k - r.val)).unwrap_or_default();
+            }
+            m.get(&(k - r.val)).is_some() 
+			  || Self::h(&r.left, k, m) 
+			  || Self::h(&r.right, k, m)
+        } else {
+            false
+        }
+    }
+}
+```
+
+## 669.trim-a-binary-search-tree
+```rust
+impl Solution {
+    pub fn trim_bst(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        l: i32,
+        r: i32,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        Self::h(&root, l, r)
+    }
+
+    fn h(
+	  t: &Option<Rc<RefCell<TreeNode>>>, 
+	  l: i32, 
+	  r: i32
+	) -> Option<Rc<RefCell<TreeNode>>> {
+        if let Some(t) = t {
+            let mut n = t.borrow_mut();
+            if n.val < l {
+                return Self::h(&n.right, l, r);
+            }
+            if n.val > r {
+                return Self::h(&n.left, l, r);
+            }
+            n.left = Self::h(&n.left, l, r);
+            n.right = Self::h(&n.right, l, r);
+            Some(t.clone())
+        } else {
+            None
+        }
+    }
+}
+```

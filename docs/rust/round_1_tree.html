@@ -711,6 +711,134 @@ impl Solution {
 }
 <span class="boring">}
 </span></code></pre></pre>
+<h2><a class="header" href="#617merge-two-binary-trees" id="617merge-two-binary-trees">617.merge-two-binary-trees</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn merge_trees(
+        mut t1: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+        mut t2: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+    ) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        Self::h(&amp;mut t1, &amp;mut t2);
+        t1
+    }
+
+    fn h(
+	  p: &amp;mut Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  q: &amp;mut Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+	) {
+        if p.is_some() &amp;&amp; q.is_some() {
+            let (mut p, mut q) = (
+                p.as_mut().unwrap().borrow_mut(),
+                q.as_mut().unwrap().borrow_mut(),
+            );
+            p.val += q.val;
+            Self::h(&amp;mut p.left, &amp;mut q.left);
+            Self::h(&amp;mut p.right, &amp;mut q.right);
+        } else if p.is_none() &amp;&amp; q.is_some() {
+            *p = q.take();
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#637average-of-levels-in-binary-tree" id="637average-of-levels-in-binary-tree">637.average-of-levels-in-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn average_of_levels(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; Vec&lt;f64&gt; {
+        let mut res: Vec&lt;f64&gt; = vec![];
+        let mut pre_res: Vec&lt;Vec&lt;f64&gt;&gt; = vec![];
+        Self::h(&amp;root, &amp;mut pre_res, 0);
+        pre_res.iter().for_each(|a| {
+            res.push(a.iter().sum::&lt;f64&gt;() / a.len() as f64);
+        });
+        res
+    }
+
+    fn h(r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, res: &amp;mut Vec&lt;Vec&lt;f64&gt;&gt;, level: usize) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if res.len() &lt; level + 1 {
+                res.push(vec![r.val as f64]);
+            } else {
+                res[level].push(r.val as f64);
+            }
+
+            Self::h(&amp;r.left, res, level + 1);
+            Self::h(&amp;r.right, res, level + 1);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#653two-sum-iv-input-is-a-bst" id="653two-sum-iv-input-is-a-bst">653.two-sum-iv-input-is-a-bst</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn find_target(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, k: i32) -&gt; bool {
+        let mut m = HashMap::&lt;i32, i32&gt;::new();
+        Self::h(&amp;root, k, &amp;mut m)
+    }
+
+    fn h(
+	  r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  k: i32, m: &amp;mut HashMap&lt;i32, i32&gt;
+	) -&gt; bool {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if r.val != (k - r.val) {
+                m.insert(r.val, (k - r.val)).unwrap_or_default();
+            }
+            m.get(&amp;(k - r.val)).is_some() 
+			  || Self::h(&amp;r.left, k, m) 
+			  || Self::h(&amp;r.right, k, m)
+        } else {
+            false
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#669trim-a-binary-search-tree" id="669trim-a-binary-search-tree">669.trim-a-binary-search-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn trim_bst(
+        root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+        l: i32,
+        r: i32,
+    ) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        Self::h(&amp;root, l, r)
+    }
+
+    fn h(
+	  t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  l: i32, 
+	  r: i32
+	) -&gt; Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; {
+        if let Some(t) = t {
+            let mut n = t.borrow_mut();
+            if n.val &lt; l {
+                return Self::h(&amp;n.right, l, r);
+            }
+            if n.val &gt; r {
+                return Self::h(&amp;n.left, l, r);
+            }
+            n.left = Self::h(&amp;n.left, l, r);
+            n.right = Self::h(&amp;n.right, l, r);
+            Some(t.clone())
+        } else {
+            None
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
 
                     </main>
 
