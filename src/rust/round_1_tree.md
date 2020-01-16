@@ -651,3 +651,117 @@ impl Solution {
     }
 }
 ```
+
+## 671.second-minimum-node-in-a-binary-tree
+```rust
+impl Solution {
+    pub fn find_second_minimum_value(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut vals: Vec<i32> = vec![];
+        Self::h(&root, &mut vals);
+        vals.sort();
+        vals.dedup();
+        if vals.len() >= 2 {
+            vals[1]
+        } else {
+            -1
+        }
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, mut vals: &mut Vec<i32>) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            vals.push(r.val);
+            Self::h(&r.left, &mut vals);
+            Self::h(&r.right, &mut vals);
+        }
+    }
+}
+```
+
+## 687.longest-univablue-path
+```rust
+impl Solution {
+    pub fn longest_univalue_path(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut c = 0;
+        Self::h(&root, &mut c);
+        c
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, c: &mut i32) -> i32 {
+        if let Some(r) = r {
+            let r = r.borrow();
+            let mut tlc = Self::h(&r.left, c);
+            let mut trc = Self::h(&r.right, c);
+
+            let (mut lc, mut rc) = (0, 0);
+            if let Some(tl) = &r.left {
+                let tl = tl.borrow();
+                if tl.val == r.val {
+                    lc = tlc + 1;
+                }
+            }
+
+            if let Some(tr) = &r.right {
+                let tr = tr.borrow();
+                if tr.val == r.val {
+                    rc = trc + 1;
+                }
+            }
+
+            *c = *c.max(&mut (lc + rc));
+            lc.max(rc)
+        } else {
+            0
+        }
+    }
+}
+```
+
+## 700.search-in-a-binary-search-tree
+```rust
+impl Solution {
+    pub fn search_bst(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        val: i32,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        Self::h(&root, val)
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, val: i32) -> Option<Rc<RefCell<TreeNode>>> {
+        if let Some(rt) = r {
+            let rt = rt.borrow();
+            if rt.val == val {
+                r.to_owned()
+            } else if rt.val > val {
+                Self::h(&rt.left, val)
+            } else {
+                Self::h(&rt.right, val)
+            }
+        } else {
+            None
+        }
+    }
+}
+```
+
+## 783.minimum-distance-between-bst-node
+```rust
+impl Solution {
+    pub fn min_diff_in_bst(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut min = i32::MAX;
+        let mut pre = i32::MIN;
+        Self::h(&root, &mut pre, &mut min);
+        min
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, pre: &mut i32, min: &mut i32) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            Self::h(&r.left, pre, min);
+            *min = (r.val.saturating_sub(*pre)).min(*min);
+            *pre = r.val; // !important;
+            Self::h(&r.right, pre, min);
+        }
+    }
+}
+```

@@ -29,17 +29,16 @@ impl Solution {
 
     fn h(t: &mut Option<Rc<RefCell<TreeNode>>>, l: i32, r: i32) -> Option<Rc<RefCell<TreeNode>>> {
         if let Some(t) = t.take() {
-            {
-                let mut n = t.borrow_mut();
-                if n.val < l {
-                    return Self::h(&mut n.right, l, r);
-                }
-                if n.val > r {
-                    return Self::h(&mut n.left, l, r);
-                }
-                n.left = Self::h(&mut n.left, l, r);
-                n.right = Self::h(&mut n.right, l, r);
+            let mut n = t.borrow_mut();
+            if n.val < l {
+                return Self::h(&mut n.right, l, r);
             }
+            if n.val > r {
+                return Self::h(&mut n.left, l, r);
+            }
+            n.left = Self::h(&mut n.left, l, r);
+            n.right = Self::h(&mut n.right, l, r);
+            drop(n);
             Some(t)
         } else {
             None
@@ -47,11 +46,11 @@ impl Solution {
     }
 }
 
-mod tree;
-use tree::*;
-
-fn main() {
-    let t = TreeNode::full_from_arr(vec![Some(1), Some(0), Some(2)], 0);
-    let r = Solution::trim_bst(t, 1, 2);
-    println!("{:#?}", r);
-}
+// mod tree;
+// use tree::*;
+//
+// fn main() {
+//     let t = TreeNode::full_from_arr(vec![Some(1), Some(0), Some(2)], 0);
+//     let r = Solution::trim_bst(t, 1, 2);
+//     println!("{:#?}", r);
+// }
