@@ -727,7 +727,10 @@ impl Solution {
         Self::h(&root, val)
     }
 
-    fn h(r: &Option<Rc<RefCell<TreeNode>>>, val: i32) -> Option<Rc<RefCell<TreeNode>>> {
+    fn h(
+	  r: &Option<Rc<RefCell<TreeNode>>>, 
+	  val: i32
+	) -> Option<Rc<RefCell<TreeNode>>> {
         if let Some(rt) = r {
             let rt = rt.borrow();
             if rt.val == val {
@@ -761,6 +764,73 @@ impl Solution {
             *min = (r.val.saturating_sub(*pre)).min(*min);
             *pre = r.val; // !important;
             Self::h(&r.right, pre, min);
+        }
+    }
+}
+```
+
+## 872.leaf-similar-trees
+```rust
+impl Solution {
+    pub fn leaf_similar(
+        root1: Option<Rc<RefCell<TreeNode>>>,
+        root2: Option<Rc<RefCell<TreeNode>>>,
+    ) -> bool {
+        Self::h(&root1, vec![]) == Self::h(&root2, vec![])
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, mut v: Vec<i32>) -> Vec<i32> {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if r.left.is_none() && r.right.is_none() {
+                v.push(r.val);
+            }
+            Self::h(&r.right, Self::h(&r.left, v))
+        } else {
+            v
+        }
+    }
+}
+```
+
+## 897.increasing-order-search-tree
+```rust
+impl Solution {
+    pub fn increasing_bst(
+	  root: Option<Rc<RefCell<TreeNode>>>
+	) -> Option<Rc<RefCell<TreeNode>>> {
+        let mut vals: Vec<i32> = Vec::new();
+        let dim = Rc::new(RefCell::new(TreeNode::new(-1)));
+        Self::h(&root, &mut vals);
+        // empty vals
+        if vals.is_empty() {
+            return None;
+        }
+
+        // share ownership after clone.
+        let mut cur = dim.clone();
+        vals.iter().for_each(|i| {
+            let n = Rc::new(RefCell::new(TreeNode::new(*i)));
+            cur.borrow_mut().right = Some(n.clone());
+            cur = n;
+        });
+
+        let tmp = &dim.borrow().right;
+        tmp.to_owned()
+    }
+
+    fn h(r: &Option<Rc<RefCell<TreeNode>>>, vals: &mut Vec<i32>) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if r.left.is_some() {
+                Self::h(&r.left, vals);
+            }
+
+            vals.push(r.val);
+
+            if r.right.is_some() {
+                Self::h(&r.right, vals);
+            }
         }
     }
 }
