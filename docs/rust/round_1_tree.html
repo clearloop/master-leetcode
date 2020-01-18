@@ -867,7 +867,7 @@ impl Solution {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<h2><a class="header" href="#687longest-univablue-path" id="687longest-univablue-path">687.longest-univablue-path</a></h2>
+<h2><a class="header" href="#687longest-univablue-path-" id="687longest-univablue-path-">687.longest-univablue-path ⭐️</a></h2>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
@@ -940,7 +940,7 @@ impl Solution {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<h2><a class="header" href="#783minimum-distance-between-bst-node" id="783minimum-distance-between-bst-node">783.minimum-distance-between-bst-node</a></h2>
+<h2><a class="header" href="#783minimum-distance-between-bst-node-" id="783minimum-distance-between-bst-node-">783.minimum-distance-between-bst-node ⭐️</a></h2>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
@@ -990,7 +990,7 @@ impl Solution {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<h2><a class="header" href="#897increasing-order-search-tree" id="897increasing-order-search-tree">897.increasing-order-search-tree</a></h2>
+<h2><a class="header" href="#897increasing-order-search-tree-" id="897increasing-order-search-tree-">897.increasing-order-search-tree ⭐️</a></h2>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
@@ -1029,6 +1029,151 @@ impl Solution {
 
             if r.right.is_some() {
                 Self::h(&amp;r.right, vals);
+            }
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#938range-sum-of-bst" id="938range-sum-of-bst">938.range-sum-of-bst</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn range_sum_bst(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, l: i32, r: i32) -&gt; i32 {
+        let mut sum = 0;
+        Self::h(&amp;root, &amp;mut sum, l, r);
+        sum
+    }
+
+    fn h(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, sum: &amp;mut i32, l: i32, r: i32) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            if t.val &lt;= r &amp;&amp; t.val &gt;= l {
+                *sum += t.val;
+            }
+
+            Self::h(&amp;t.left, sum, l, r);
+            Self::h(&amp;t.right, sum, l, r);
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#965univalued-binary-tree" id="965univalued-binary-tree">965.univalued-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn is_unival_tree(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; bool {
+        let mut res = true;
+        Self::h(&amp;root, &amp;mut res);
+        res
+    }
+
+    fn h(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, res: &amp;mut bool) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            if let Some(l) = &amp;t.left {
+                if l.borrow().val != t.val {
+                    *res = false;
+                }
+                Self::h(&amp;t.left, res);
+            }
+
+            if let Some(r) = &amp;t.right {
+                if r.borrow().val != t.val {
+                    *res = false;
+                }
+                Self::h(&amp;t.right, res);
+            }
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#993cusins-in-binary-tree" id="993cusins-in-binary-tree">993.cusins-in-binary-tree</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn is_cousins(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, x: i32, y: i32) -&gt; bool {
+        let mut m: HashMap&lt;i32, Vec&lt;Option&lt;i32&gt;&gt;&gt; = HashMap::new();
+        Self::h(&amp;root, &amp;mut m, 0);
+
+        let mut res = false;
+        m.values().for_each(|i| {
+            let mut xi = -1;
+            let mut yi = -1;
+            i.iter().enumerate().for_each(|(p, q)| {
+                if q == &amp;Some(x) {
+                    xi = p as i32;
+                } else if q == &amp;Some(y) {
+                    yi = p as i32;
+                }
+
+                if (xi != -1) &amp;&amp; (yi != -1) {
+                    if (xi - yi).abs() == 1 {
+                        if xi.max(yi) % 2 == 0 {
+                            res = true;
+                        }
+                    } else {
+                        res = true;
+                    }
+                }
+            })
+        });
+
+        res
+    }
+
+    fn h(
+	  r: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, 
+	  m: &amp;mut HashMap&lt;i32, Vec&lt;Option&lt;i32&gt;&gt;&gt;, 
+	  d: i32
+	) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if let Some(v) = m.get_mut(&amp;d) {
+                v.push(Some(r.val));
+            } else {
+                m.insert(d, vec![Some(r.val)]);
+            }
+            Self::h(&amp;r.left, m, d + 1);
+            Self::h(&amp;r.right, m, d + 1);
+        } else {
+            if let Some(v) = m.get_mut(&amp;d) {
+                v.push(None);
+            } else {
+                m.insert(d, vec![None]);
+            }
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#1022sum-of-root-to-leaf-binary-numbers" id="1022sum-of-root-to-leaf-binary-numbers">1022.sum-of-root-to-leaf-binary-numbers</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn sum_root_to_leaf(root: Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) -&gt; i32 {
+        let mut res = 0;
+        Self::h(&amp;root, &amp;mut res, &amp;mut vec![]);
+        res
+    }
+
+    fn h(t: &amp;Option&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;, res: &amp;mut i32, p: &amp;mut Vec&lt;i32&gt;) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            p.push(t.val);
+            if t.left.is_none() &amp;&amp; t.right.is_none() {
+                let mut c = 0;
+                p.iter().for_each(|x| c = (c &lt;&lt; 1) | x);
+                *res += c;
+            } else {
+                Self::h(&amp;t.left, res, &amp;mut p.clone());
+                Self::h(&amp;t.right, res, &amp;mut p.clone());
             }
         }
     }

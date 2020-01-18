@@ -678,7 +678,7 @@ impl Solution {
 }
 ```
 
-## 687.longest-univablue-path
+## 687.longest-univablue-path ⭐️
 ```rust
 impl Solution {
     pub fn longest_univalue_path(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
@@ -747,7 +747,7 @@ impl Solution {
 }
 ```
 
-## 783.minimum-distance-between-bst-node
+## 783.minimum-distance-between-bst-node ⭐️
 ```rust
 impl Solution {
     pub fn min_diff_in_bst(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
@@ -793,7 +793,7 @@ impl Solution {
 }
 ```
 
-## 897.increasing-order-search-tree
+## 897.increasing-order-search-tree ⭐️
 ```rust
 impl Solution {
     pub fn increasing_bst(
@@ -830,6 +830,146 @@ impl Solution {
 
             if r.right.is_some() {
                 Self::h(&r.right, vals);
+            }
+        }
+    }
+}
+```
+
+
+## 938.range-sum-of-bst
+
+```rust
+impl Solution {
+    pub fn range_sum_bst(root: Option<Rc<RefCell<TreeNode>>>, l: i32, r: i32) -> i32 {
+        let mut sum = 0;
+        Self::h(&root, &mut sum, l, r);
+        sum
+    }
+
+    fn h(t: &Option<Rc<RefCell<TreeNode>>>, sum: &mut i32, l: i32, r: i32) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            if t.val <= r && t.val >= l {
+                *sum += t.val;
+            }
+
+            Self::h(&t.left, sum, l, r);
+            Self::h(&t.right, sum, l, r);
+        }
+    }
+}
+```
+
+## 965.univalued-binary-tree
+
+```rust
+impl Solution {
+    pub fn is_unival_tree(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        let mut res = true;
+        Self::h(&root, &mut res);
+        res
+    }
+
+    fn h(t: &Option<Rc<RefCell<TreeNode>>>, res: &mut bool) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            if let Some(l) = &t.left {
+                if l.borrow().val != t.val {
+                    *res = false;
+                }
+                Self::h(&t.left, res);
+            }
+
+            if let Some(r) = &t.right {
+                if r.borrow().val != t.val {
+                    *res = false;
+                }
+                Self::h(&t.right, res);
+            }
+        }
+    }
+}
+```
+
+## 993.cusins-in-binary-tree
+```rust
+impl Solution {
+    pub fn is_cousins(root: Option<Rc<RefCell<TreeNode>>>, x: i32, y: i32) -> bool {
+        let mut m: HashMap<i32, Vec<Option<i32>>> = HashMap::new();
+        Self::h(&root, &mut m, 0);
+
+        let mut res = false;
+        m.values().for_each(|i| {
+            let mut xi = -1;
+            let mut yi = -1;
+            i.iter().enumerate().for_each(|(p, q)| {
+                if q == &Some(x) {
+                    xi = p as i32;
+                } else if q == &Some(y) {
+                    yi = p as i32;
+                }
+
+                if (xi != -1) && (yi != -1) {
+                    if (xi - yi).abs() == 1 {
+                        if xi.max(yi) % 2 == 0 {
+                            res = true;
+                        }
+                    } else {
+                        res = true;
+                    }
+                }
+            })
+        });
+
+        res
+    }
+
+    fn h(
+	  r: &Option<Rc<RefCell<TreeNode>>>, 
+	  m: &mut HashMap<i32, Vec<Option<i32>>>, 
+	  d: i32
+	) {
+        if let Some(r) = r {
+            let r = r.borrow();
+            if let Some(v) = m.get_mut(&d) {
+                v.push(Some(r.val));
+            } else {
+                m.insert(d, vec![Some(r.val)]);
+            }
+            Self::h(&r.left, m, d + 1);
+            Self::h(&r.right, m, d + 1);
+        } else {
+            if let Some(v) = m.get_mut(&d) {
+                v.push(None);
+            } else {
+                m.insert(d, vec![None]);
+            }
+        }
+    }
+}
+```
+
+## 1022.sum-of-root-to-leaf-binary-numbers
+```rust
+impl Solution {
+    pub fn sum_root_to_leaf(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut res = 0;
+        Self::h(&root, &mut res, &mut vec![]);
+        res
+    }
+
+    fn h(t: &Option<Rc<RefCell<TreeNode>>>, res: &mut i32, p: &mut Vec<i32>) {
+        if let Some(t) = t {
+            let t = t.borrow();
+            p.push(t.val);
+            if t.left.is_none() && t.right.is_none() {
+                let mut c = 0;
+                p.iter().for_each(|x| c = (c << 1) | x);
+                *res += c;
+            } else {
+                Self::h(&t.left, res, &mut p.clone());
+                Self::h(&t.right, res, &mut p.clone());
             }
         }
     }
