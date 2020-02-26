@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="empty.html"><strong aria-hidden="true">1.</strong> C</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">2.</strong> Java</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">3.</strong> Koltin</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">4.</strong> Python</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">5.</strong> Rust</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1.html"><strong aria-hidden="true">5.1.</strong> Round 1</a></li><li><ol class="section"><li class="expanded "><a href="rust/round_1_linked_list.html"><strong aria-hidden="true">5.1.1.</strong> Linked-List</a></li><li class="expanded "><a href="rust/round_1_tree.html"><strong aria-hidden="true">5.1.2.</strong> Tree</a></li></ol></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded "><a href="empty.html"><strong aria-hidden="true">1.</strong> C</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">2.</strong> Java</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">3.</strong> Koltin</a></li><li class="expanded "><a href="empty.html"><strong aria-hidden="true">4.</strong> Python</a></li><li class="expanded "><a href="rust/index.html"><strong aria-hidden="true">5.</strong> Rust</a></li><li><ol class="section"><li class="expanded "><a href="rust/easy_linked_list.html"><strong aria-hidden="true">5.1.</strong> Linked-List</a></li><li class="expanded "><a href="rust/easy_random.html"><strong aria-hidden="true">5.2.</strong> Random</a></li><li class="expanded "><a href="rust/easy_tree.html"><strong aria-hidden="true">5.3.</strong> Tree</a></li><li class="expanded "><a href="rust/lcof.html"><strong aria-hidden="true">5.4.</strong> lcof</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -154,8 +154,7 @@
 <p>waiting for ur commit 🦀</p>
 <p>waiting for ur commit 🦀</p>
 <p>waiting for ur commit 🦀</p>
-<p>waiting for ur commit 🦀</p>
-<h1><a class="header" href="#round-1" id="round-1">Round 1</a></h1>
+<h1><a class="header" href="#concepts" id="concepts">Concepts</a></h1>
 <h2><a class="header" href="#1-boxt-and-rc" id="1-boxt-and-rc">1. <code>Box&lt;T&gt;</code> and <code>Rc</code></a></h2>
 <p><code>Box&lt;T&gt;</code>, casually referred to as a 'box', provides the simplest form of heap allocation in Rust. Boxes provide ownership for this allocation, and drop their contents when they go out of scope.</p>
 <p><strong>What's the difference between <code>Rc&lt;T&gt;</code> and <code>Box&lt;T&gt;</code>?</strong></p>
@@ -520,6 +519,48 @@ assert_eq!(y, None);
         }
 
         ret
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h1><a class="header" href="#random" id="random">Random</a></h1>
+<h2><a class="header" href="#20valid-parentheses" id="20valid-parentheses">20.valid-parentheses</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn is_valid(s: String) -&gt; bool {
+        use std::collections::VecDeque;
+        let mut r = true;
+        let mut stk = VecDeque::&lt;char&gt;::new();
+        s.chars().for_each(|x| match x {
+            '(' | '{' | '[' =&gt; stk.push_back(x),
+            ')' =&gt; r = (stk.pop_front() == Some('(')) &amp;&amp; r,
+            '}' =&gt; r = (stk.pop_front() == Some('{')) &amp;&amp; r,
+            ']' =&gt; r = (stk.pop_front() == Some('[')) &amp;&amp; r,
+            _ =&gt; r = false,
+        });
+        r &amp;&amp; stk.is_empty()
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#50powx-n" id="50powx-n">50.powx-n</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn my_pow(x: f64, n: i32) -&gt; f64 {
+        use std::i32::MIN;
+        match n {
+            o if o == 0 =&gt; 1.0,
+            o if o == MIN =&gt; Self::my_pow(x * x, MIN / 2),
+            o if o &lt; 0 =&gt; 1.0 / Self::my_pow(x, -n),
+            _ =&gt; match n % 2 {
+                0 =&gt; Self::my_pow(x * x, n / 2),
+                _ =&gt; x * Self::my_pow(x * x, n / 2),
+            },
+        }
     }
 }
 <span class="boring">}
@@ -1552,6 +1593,63 @@ impl Solution {
                 Self::h(&amp;t.right, res, &amp;mut p.clone());
             }
         }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h1><a class="header" href="#lcof" id="lcof">lcof</a></h1>
+<h2><a class="header" href="#5replace-space" id="5replace-space">5.replace-space</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn replace_space(s: String) -&gt; String {
+        let mut res = String::new();
+        s.chars().for_each(|x| if x.is_whitespace() {
+            res.push_str(&quot;%20&quot;);
+        } else {
+            res.push(x);
+        });
+        
+        res
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#17print-n-numbers-from-1" id="17print-n-numbers-from-1">17.print-n-numbers-from-1</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn print_numbers(n: i32) -&gt; Vec&lt;i32&gt; {
+        (1..(&quot;9&quot;.repeat(n as usize).parse().unwrap_or(1)) + 1).collect()
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#22k-node-in-reverse-linked-list" id="22k-node-in-reverse-linked-list">22.k-node-in-reverse-linked-list</a></h2>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>impl Solution {
+    pub fn get_kth_from_end(
+      mut head: Option&lt;Box&lt;ListNode&gt;&gt;, k: i32
+    ) -&gt; Option&lt;Box&lt;ListNode&gt;&gt; {
+        let mut ptr = head.clone();
+        for i in 0..k {
+            if let Some(ln) = ptr {
+                ptr = ln.next;
+            } else {
+                return None;
+            }
+        }
+
+        while ptr.is_some() {
+            ptr = ptr.unwrap().next;
+            head = head.unwrap().next;
+        }
+
+        head
     }
 }
 <span class="boring">}

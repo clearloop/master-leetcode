@@ -4,7 +4,9 @@
 - [Java](./empty.md)
 - [Koltin](./empty.md)
 - [Python](./empty.md)
-- [Rust](./empty.md)
-  - [Round 1](./rust/round_1.md)
-    - [Linked-List](./rust/round_1_linked_list.md)
-	- [Tree](./rust/round_1_tree.md)
+- [Rust](./rust/README.md)
+  - [Linked-List](./rust/easy_linked_list.md)
+  - [Random](./rust/easy_random.md)
+  - [Tree](./rust/easy_tree.md)
+  - [lcof](./rust/lcof.md)
+	
